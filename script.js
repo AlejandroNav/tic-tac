@@ -184,15 +184,27 @@ const displayController = (function () {
     const resetButtonElement = document.getElementById("reset-button");
 
     function renderBoard() {
+        gameBoardElement.innerHTML = "";
+
+        const cells = gameController.getBoard();
+
+        cells.forEach((cell, index) => {
+            const cellElement = document.createElement("button");
+            cellElement.classList.add("cell");
+            cellElement.dataset.index = index;
+            cellElement.textContent = cell;
+            gameBoardElement.appendChild(cellElement);
+        });
 
     }
 
     function renderStatus() {
-
+        statusMessageElement.textContent = gameController.getStatusMessage();
     }
 
     function updateScreen() {
-
+        renderBoard();
+        renderStatus();
     }
 
     function handleCellClick(event) {
@@ -218,7 +230,7 @@ const displayController = (function () {
 })();
 
 
-console.log("Initial status:", gameController.getStatusMessage());
-
+displayController.updateScreen();
 gameController.playRound(0);
 console.log("After first move:", gameController.getStatusMessage());
+displayController.updateScreen();
