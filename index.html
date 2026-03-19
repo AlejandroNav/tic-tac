@@ -1,25 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Title</title>
+  <title>Tic Tac Toe</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
 </head>
-
 <body>
-  <header>
-    <h1>Project Title</h1>
-  </header>
-  <main>
+  <main class="page">
     <h1>Tic Tac Toe</h1>
-    <p id="status-message">Game status will appear here.</p>
-    <div id="game-board">
+
+    <p id="status-message">Player 1's turn.</p>
+
+    <div class="name-controls">
+      <input type="text" id="player-one-input" placeholder="Player 1 name">
+      <input type="text" id="player-two-input" placeholder="Player 2 name">
+      <button id="set-names-button">Set Names</button>
     </div>
+
+    <div class="scoreboard">
+      <div class="player-panel active-player" id="player-one-panel">
+        <div class="player-marker">X</div>
+        <div class="player-name" id="player-one-name">Player 1</div>
+      </div>
+
+      <div class="score-panel">
+        <span id="score-x">0</span>
+        <span class="score-separator">-</span>
+        <span id="score-o">0</span>
+      </div>
+
+      <div class="player-panel" id="player-two-panel">
+        <div class="player-marker">O</div>
+        <div class="player-name" id="player-two-name">Player 2</div>
+      </div>
+    </div>
+
+    <div id="game-board"></div>
+
     <button id="reset-button">Reset Game</button>
   </main>
-  <script src="script.js"></script>
 </body>
-
 </html>

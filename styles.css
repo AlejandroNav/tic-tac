@@ -1,80 +1,234 @@
+@import url('https://fonts.googleapis.com/css2?family=Indie+Flower&family=Cormorant+Infant:ital,wght@0,400;0,600;1,400&display=swap');
+
+:root {
+  --color-bg: rgb(121, 49, 73);
+  --color-text: #fde68a;
+  --color-text-muted: rgba(253, 230, 138, 0.55);
+  --color-border: rgba(253, 230, 138, 0.35);
+  --color-border-active: #fde68a;
+  --color-surface: rgba(0, 0, 0, 0.0);
+  --color-active-bg: rgba(253, 230, 138, 0.12);
+  --color-winner-panel-bg: rgba(253, 230, 138, 0.2);
+  --color-winner-panel-border: #fde68a;
+  --color-winning-cell-bg: rgba(253, 230, 138, 0.15);
+  --color-winning-cell-border: #fde68a;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+}
+
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 body {
-  font-family: Arial, sans-serif;
-  line-height: 1.5;
-  color: black;
-  background-color: white;
+  margin: 0;
+  font-family: 'Cormorant Infant', Georgia, serif;
+  text-align: center;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
-img {
-  max-width: 100%;
-  display: block;
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0rem 1.5rem;
 }
 
-a {
-  color: black;
-  text-decoration: none;
+h1 {
+  font-family: 'Indie Flower', cursive;
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 0rem;
+  letter-spacing: 0.3em;
+  margin-top: .5rem;
 }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
+#status-message {
+    letter-spacing: 0.2em;
+  font-family: 'Cormorant Infant', Georgia, serif;
+  font-size: 1.44rem;
+  font-style: italic;
+  margin-bottom: .5rem;
+  min-height: 1.5rem;
+  color: var(--color-text-muted);
 }
 
-header,
-main,
-section,
-footer {
-  display: block;
+.name-controls {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
 }
 
-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid black;
+.name-controls input,
+.name-controls button {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: 'Cormorant Infant', Georgia, serif;
+  font-size: 1rem;
+  background: rgba(0, 0, 0, 0.15);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
 }
 
-main {
-  padding: 1.5rem;
+.name-controls input::placeholder {
+  color: rgba(253, 230, 138, 0.3);
 }
 
-section {
-  max-width: 900px;
+.name-controls input:focus {
+  border-color: var(--color-border-active);
 }
 
-h1,
-h2,
-h3 {
-  margin-bottom: 1rem;
+.name-controls button {
+  cursor: pointer;
+  letter-spacing: 0.04em;
 }
 
-p {
-  margin-bottom: 1rem;
+.name-controls button:hover {
+  border-color: var(--color-border-active);
+  background: rgba(253, 230, 138, 0.08);
+}
+
+.scoreboard {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: .85rem;
+  max-width: 480px;
+  margin: 0 auto 1rem;
+}
+
+.player-panel {
+  flex: 1;
+  text-align: center;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.12);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.score-panel {
+  min-width: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.12);
+  padding: 0.9rem 0.5rem;
+}
+
+.player-marker {
+  font-family: 'Indie Flower', cursive;
+  font-size: 2.2rem;
+  line-height: 1;
+  color: var(--color-text);
+  margin-bottom: 0.2rem;
+}
+
+.player-name {
+  font-family: 'Cormorant Infant', Georgia, serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+.score-panel {
+  font-family: 'Indie Flower', cursive;
+  font-size: 2rem;
+  color: var(--color-text);
+}
+
+.score-separator {
+  opacity: 0.3;
+  font-family: 'Cormorant Infant', serif;
+  font-size: 1.5rem;
+}
+
+.active-player {
+  background: var(--color-active-bg);
+  border-color: var(--color-border-active);
+}
+
+.active-player .player-name {
+  color: var(--color-text);
+}
+
+.winner-player {
+  background: var(--color-winner-panel-bg);
+  border-color: var(--color-winner-panel-border);
+}
+
+/* ── The Board ── */
+#game-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  max-width: 380px;
+  margin: 0 auto 1.75rem;
 }
 
 .cell {
-  border: 1px solid black;
-  width: 100%;
   aspect-ratio: 1 / 1;
-  font-size: 2rem;
+  width: 100%;
+  font-family: 'Indie Flower', cursive;
+  font-size: 5rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  box-sizing: border-box;
+  background: transparent;
+  color: var(--color-text);
+  border: none;
+  transition: background 0.12s;
+
+  /* hand-drawn inner borders only */
+  border-right: 2px solid var(--color-border);
+  border-bottom: 2px solid var(--color-border);
 }
 
-#game-board {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-  max-width: 300px;
-  margin: 1.5rem auto;
+/* remove right border on last column */
+.cell:nth-child(3n) {
+  border-right: none;
+}
+
+/* remove bottom border on last row */
+.cell:nth-child(7),
+.cell:nth-child(8),
+.cell:nth-child(9) {
+  border-bottom: none;
+}
+
+.cell:hover:not(:disabled) {
+  background: rgba(253, 230, 138, 0.05);
+}
+
+.winning-cell {
+  background: var(--color-winning-cell-bg);
+}
+
+#reset-button {
+  padding: 0.6rem 1.75rem;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--color-text);
+  font-family: 'Cormorant Infant', Georgia, serif;
+  font-size: 1rem;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+#reset-button:hover {
+  background: rgba(253, 230, 138, 0.08);
+  border-color: var(--color-border-active);
 }

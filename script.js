@@ -51,9 +51,36 @@ const gameController = (function () {
     let currentPlayer = playerOne;
     let gameOver = false;
     let statusMessage = "Player 1's turn.";
+    let winner = null;
+    let winningCells = [];
+    let scores = {
+        X: 0,
+        O: 0
+    };
+
+    function getScores() {
+        return { ...scores };
+    }
 
     function getCurrentPlayer() {
         return currentPlayer;
+    }
+
+    function setPlayerNames(playerOneName, playerTwoName) {
+        const trimmedPlayerOneName = playerOneName.trim();
+        const trimmedPlayerTwoName = playerTwoName.trim();
+
+        if (trimmedPlayerOneName !== "") {
+            playerOne.name = trimmedPlayerOneName;
+        }
+
+        if (trimmedPlayerTwoName !== "") {
+            playerTwo.name = trimmedPlayerTwoName;
+        }
+
+        if (!gameOver) {
+            statusMessage = currentPlayer.name + "'s turn.";
+        }
     }
 
     function isGameOver() {
@@ -62,6 +89,14 @@ const gameController = (function () {
 
     function getStatusMessage() {
         return statusMessage;
+    }
+
+    function getWinner() {
+        return winner;
+    }
+
+    function getWinningCells() {
+        return [...winningCells];
     }
 
     function switchPlayer() {
@@ -94,12 +129,13 @@ const gameController = (function () {
             if (cells[a] !== "") {
                 if (cells[a] === cells[b] && cells[b] === cells[c]) {
                     gameOver = true;
-                    return true;
+                    winningCells = [a, b, c];
+                    return [a, b, c];
                 }
             }
         }
 
-        return false;
+        return null;
     }
 
     function checkDraw() {
@@ -118,7 +154,6 @@ const gameController = (function () {
     function playRound(index) {
         if (gameOver) {
             statusMessage = "Game ended. Please reset the game to play again.";
-            console.log(statusMessage);
             return;
         }
 
@@ -126,33 +161,34 @@ const gameController = (function () {
 
         if (!gameboard.placeMarker(index, playerPlayingNow.marker)) {
             statusMessage = "Invalid move. Please try again.";
-            console.log(statusMessage);
             return;
         }
 
-        if (checkWinner()) {
+        const winningLine = checkWinner();
+
+        if (winningLine) {
+            scores[playerPlayingNow.marker]++;
+            winner = playerPlayingNow;
             statusMessage = playerPlayingNow.name + " wins!";
-            console.log(statusMessage);
             return;
         }
 
         if (checkDraw()) {
             statusMessage = "It's a draw!";
-            console.log(statusMessage);
             return;
         }
 
         switchPlayer();
         statusMessage = getCurrentPlayer().name + "'s turn.";
-        console.log(statusMessage);
     }
 
     function resetGame() {
         gameboard.reset();
         gameOver = false;
         currentPlayer = playerOne;
+        winner = null;
         statusMessage = "Player 1's turn.";
-        console.log("Game reset. Player 1 goes first.");
+        winningCells = [];
     }
 
     function getBoard() {
@@ -168,69 +204,138 @@ const gameController = (function () {
 
     return {
         getCurrentPlayer,
+        setPlayerNames,
         isGameOver,
         getStatusMessage,
+        getWinner,
+        getWinningCells,
         playRound,
         resetGame,
         getBoard,
+        getScores,
         getPlayers
     };
 })();
-
 
 const displayController = (function () {
     const statusMessageElement = document.getElementById("status-message");
     const gameBoardElement = document.getElementById("game-board");
     const resetButtonElement = document.getElementById("reset-button");
+    const scoreXElement = document.getElementById("score-x");
+    const scoreOElement = document.getElementById("score-o");
+    const playerOnePanelElement = document.getElementById("player-one-panel");
+    const playerTwoPanelElement = document.getElementById("player-two-panel");
+    const playerOneInputElement = document.getElementById("player-one-input");
+    const playerTwoInputElement = document.getElementById("player-two-input");
+    const setNamesButtonElement = document.getElementById("set-names-button");
+    const playerOneNameElement = document.getElementById("player-one-name");
+    const playerTwoNameElement = document.getElementById("player-two-name");
 
     function renderBoard() {
         gameBoardElement.innerHTML = "";
 
         const cells = gameController.getBoard();
+        const winningCells = gameController.getWinningCells();
 
         cells.forEach((cell, index) => {
             const cellElement = document.createElement("button");
             cellElement.classList.add("cell");
             cellElement.dataset.index = index;
             cellElement.textContent = cell;
+
+            if (winningCells.includes(index)) {
+                cellElement.classList.add("winning-cell");
+            }
+
             gameBoardElement.appendChild(cellElement);
         });
-
     }
 
     function renderStatus() {
         statusMessageElement.textContent = gameController.getStatusMessage();
     }
 
+    function renderScores() {
+        const scores = gameController.getScores();
+        scoreXElement.textContent = scores.X;
+        scoreOElement.textContent = scores.O;
+    }
+
+    function renderNames() {
+        const players = gameController.getPlayers();
+        playerOneNameElement.textContent = players.playerOne.name;
+        playerTwoNameElement.textContent = players.playerTwo.name;
+    }
+
+    function renderActivePlayer() {
+        const winner = gameController.getWinner();
+
+        playerOnePanelElement.classList.remove("active-player", "winner-player");
+        playerTwoPanelElement.classList.remove("active-player", "winner-player");
+
+        if (winner) {
+            if (winner.marker === "X") {
+                playerOnePanelElement.classList.add("winner-player");
+            } else {
+                playerTwoPanelElement.classList.add("winner-player");
+            }
+            return;
+        }
+
+        const currentPlayer = gameController.getCurrentPlayer();
+
+        if (currentPlayer.marker === "X") {
+            playerOnePanelElement.classList.add("active-player");
+        } else {
+            playerTwoPanelElement.classList.add("active-player");
+        }
+    }
+
     function updateScreen() {
         renderBoard();
         renderStatus();
+        renderScores();
+        renderNames();
+        renderActivePlayer();
     }
 
     function handleCellClick(event) {
+        const clickedCell = event.target;
 
+        if (!clickedCell.classList.contains("cell")) {
+            return;
+        }
+
+        const index = Number(clickedCell.dataset.index);
+        gameController.playRound(index);
+        updateScreen();
     }
 
     function handleReset() {
+        gameController.resetGame();
+        updateScreen();
+    }
 
+    function handleSetNames() {
+        gameController.setPlayerNames(
+            playerOneInputElement.value,
+            playerTwoInputElement.value
+        );
+        updateScreen();
     }
 
     function bindEvents() {
-
+        gameBoardElement.addEventListener("click", handleCellClick);
+        resetButtonElement.addEventListener("click", handleReset);
+        setNamesButtonElement.addEventListener("click", handleSetNames);
     }
 
     return {
-        renderBoard,
-        renderStatus,
         updateScreen,
-        handleCellClick,
-        handleReset,
-        bindEvents
+        bindEvents,
+        handleSetNames
     };
 })();
 
-
 displayController.updateScreen();
-gameController.playRound(0);
-console.log("After first move:", gameController.getStatusMessage());
-displayController.updateScreen();
+displayController.bindEvents();
